@@ -1,0 +1,68 @@
+﻿@model TestTask.Models.ViewModels.ProductViewModel;
+
+@{
+    Layout = "_WebLayout";
+}
+
+<!-- Products Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+            <h6 class="section-title bg-white text-center text-primary px-3">Products</h6>
+            <h1 class="display-6 mb-4">We Focus On Making The Best Products</h1>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <input type="text" id="searchInput" class="form-control p-4" placeholder="Search by name..." />
+            </div>
+        </div>
+        <hr />
+        <div class="row" id="productList">
+            @foreach (var product in Model.AllProducts)
+            {
+                <div class="col-lg-4 col-md-6 mb-4 wow fadeInUp" data-wow-delay="0.1s">
+                    <a class="service-item d-block rounded text-center h-100 p-4" href="">
+                        <img class="img-fluid rounded mb-4" src="/WebAssests/img/service-1.jpg" alt="@product.Name">
+                        <h4 class="mb-0">@product.Name</h4>
+                        <span>Price: @product.Price.ToString("C")</span><br />
+                        <span>Quantity: @product.Quantity</span>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<!-- Products End -->
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const query = this.value;
+
+            fetch(`/Home/Search?Name=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const productList = document.getElementById('productList');
+                    productList.innerHTML = ''; // Clear current products
+
+                    // Check if there are any results
+                    if (data.length === 0) {
+                        productList.innerHTML = '<p class="text-center">No products found.</p>';
+                        return;
+                    }
+
+                    data.forEach(product => {
+                        const card = `
+                                    <div class="col-lg-4 col-md-6 mb-4 wow fadeInUp" data-wow-delay="0.1s">
+                                        <a class="service-item d-block rounded text-center h-100 p-4" href="">
+                                            <img class="img-fluid rounded mb-4" src="/WebAssests/img/service-1.jpg" alt="${product.name}">
+                                            <h4 class="mb-0">${product.name}</h4>
+                                            <span>Price: ${product.price}</span><br />
+                                            <span>Quantity: ${product.quantity}</span>
+                                        </a>
+                                    </div>`;
+                        productList.innerHTML += card;
+                    });
+                })
+                .catch(error => console.error('Error fetching products:', error));
+        });
+    </script>
